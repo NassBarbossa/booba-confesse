@@ -1,4 +1,5 @@
 import { DuckCounter } from "@/components/DuckCounter";
+import { ConfessionBooth } from "@/components/ConfessionBooth";
 
 export default function Home() {
   return (
@@ -15,11 +16,9 @@ export default function Home() {
           <DuckCounter />
         </header>
 
-        {/* Main confession area - placeholder */}
+        {/* Main confession booth */}
         <div className="max-w-2xl mx-auto">
-          <div className="bg-zinc-800 rounded-lg p-8 text-center">
-            <p className="text-zinc-400">Confession booth à venir...</p>
-          </div>
+          <ConfessionBooth />
         </div>
 
         {/* Parody disclaimer */}
