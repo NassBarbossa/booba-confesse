@@ -1,13 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
 
-type MouthShape = "closed" | "small" | "medium" | "wide" | "o" | "ee";
+export type MouthShape = "closed" | "small" | "medium" | "wide" | "o" | "ee";
 
 interface BoobaCharacterProps {
   mouthShape?: MouthShape;
-  isAnimating?: boolean;
 }
 
 const mouthImages: Record<MouthShape, string> = {
@@ -19,28 +17,7 @@ const mouthImages: Record<MouthShape, string> = {
   ee: "/booba/mouth-ee.png",
 };
 
-export function BoobaCharacter({
-  mouthShape = "closed",
-  isAnimating = false
-}: BoobaCharacterProps) {
-  const [currentMouth, setCurrentMouth] = useState<MouthShape>(mouthShape);
-
-  useEffect(() => {
-    if (!isAnimating) {
-      setCurrentMouth(mouthShape);
-      return;
-    }
-
-    // Random mouth animation when animating (will be replaced by audio-driven)
-    const interval = setInterval(() => {
-      const shapes: MouthShape[] = ["closed", "small", "medium", "wide", "o", "ee"];
-      const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-      setCurrentMouth(randomShape);
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [isAnimating, mouthShape]);
-
+export function BoobaCharacter({ mouthShape = "closed" }: BoobaCharacterProps) {
   return (
     <div className="relative w-64 h-80 mx-auto">
       {/* Base character */}
@@ -52,10 +29,10 @@ export function BoobaCharacter({
         priority
       />
 
-      {/* Mouth overlay - positioned on face area */}
+      {/* Mouth overlay */}
       <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-20 h-12">
         <Image
-          src={mouthImages[currentMouth]}
+          src={mouthImages[mouthShape]}
           alt="mouth"
           fill
           className="object-contain transition-opacity duration-75"

@@ -1,15 +1,21 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { BoobaCharacter } from "./BoobaCharacter";
 import { ConfessionInput } from "./ConfessionInput";
+import { useLipSync } from "@/lib/useLipSync";
 
 type BoothState = "idle" | "loading" | "playing" | "done";
 
 export function ConfessionBooth() {
   const [state, setState] = useState<BoothState>("idle");
   const [confessionText, setConfessionText] = useState<string>("");
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+
+  const mouthShape = useLipSync({
+    audioElement,
+    isPlaying: state === "playing"
+  });
 
   const handleConfession = async (text: string) => {
     setState("loading");
@@ -29,24 +35,25 @@ export function ConfessionBooth() {
 
       const { audio, contentType } = await response.json();
 
-      // Create audio element and play
+      // Create audio element
       const audioBlob = new Blob(
         [Uint8Array.from(atob(audio), c => c.charCodeAt(0))],
         { type: contentType }
       );
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      const audioElement = new Audio(audioUrl);
-      audioRef.current = audioElement;
+      const newAudio = new Audio(audioUrl);
+      newAudio.crossOrigin = "anonymous";
+      setAudioElement(newAudio);
 
       setState("playing");
 
-      audioElement.onended = () => {
+      newAudio.onended = () => {
         setState("done");
         URL.revokeObjectURL(audioUrl);
       };
 
-      await audioElement.play();
+      await newAudio.play();
     } catch (error) {
       console.error("Error generating confession:", error);
       setState("idle");
@@ -55,9 +62,9 @@ export function ConfessionBooth() {
   };
 
   const handleReset = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+    if (audioElement) {
+      audioElement.pause();
+      setAudioElement(null);
     }
     setState("idle");
     setConfessionText("");
@@ -86,12 +93,9 @@ export function ConfessionBooth() {
 
       {/* Content */}
       <div className="relative z-10 p-8">
-        {/* Character */}
+        {/* Character with lip sync */}
         <div className="mb-8">
-          <BoobaCharacter
-            isAnimating={state === "playing"}
-            mouthShape={state === "playing" ? undefined : "closed"}
-          />
+          <BoobaCharacter mouthShape={state === "playing" ? mouthShape : "closed"} />
         </div>
 
         {/* Confession text display during playback */}
