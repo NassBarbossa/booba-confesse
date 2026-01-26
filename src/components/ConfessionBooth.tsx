@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { BoobaCharacter } from "./BoobaCharacter";
 import { ConfessionInput } from "./ConfessionInput";
 
@@ -9,29 +9,56 @@ type BoothState = "idle" | "loading" | "playing" | "done";
 export function ConfessionBooth() {
   const [state, setState] = useState<BoothState>("idle");
   const [confessionText, setConfessionText] = useState<string>("");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleConfession = async (text: string) => {
     setState("loading");
     setConfessionText(text);
 
     try {
-      // TODO: Call ElevenLabs API
-      // For now, simulate a delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate audio");
+      }
+
+      const { audio, contentType } = await response.json();
+
+      // Create audio element and play
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audio), c => c.charCodeAt(0))],
+        { type: contentType }
+      );
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audioElement = new Audio(audioUrl);
+      audioRef.current = audioElement;
 
       setState("playing");
 
-      // Simulate playback duration
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      audioElement.onended = () => {
+        setState("done");
+        URL.revokeObjectURL(audioUrl);
+      };
 
-      setState("done");
+      await audioElement.play();
     } catch (error) {
       console.error("Error generating confession:", error);
       setState("idle");
+      alert("Erreur lors de la génération. Réessaie.");
     }
   };
 
   const handleReset = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     setState("idle");
     setConfessionText("");
   };
@@ -71,7 +98,7 @@ export function ConfessionBooth() {
         {(state === "playing" || state === "done") && confessionText && (
           <div className="mb-6 p-4 bg-black/50 rounded-lg">
             <p className="text-lg text-white italic text-center">
-              "{confessionText}"
+              &quot;{confessionText}&quot;
             </p>
           </div>
         )}
