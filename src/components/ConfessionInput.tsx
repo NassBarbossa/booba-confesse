@@ -36,8 +36,8 @@ export function ConfessionInput({
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, maxLength))}
           placeholder="J'ai peur de Sadek..."
-          className="w-full h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg
-                     text-white placeholder-zinc-500 resize-none
+          className="w-full h-24 md:h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg
+                     text-base text-white placeholder-zinc-500 resize-none
                      focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
           disabled={isLoading}
         />

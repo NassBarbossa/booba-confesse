@@ -19,7 +19,7 @@ const mouthImages: Record<MouthShape, string> = {
 
 export function BoobaCharacter({ mouthShape = "closed" }: BoobaCharacterProps) {
   return (
-    <div className="relative w-64 h-80 mx-auto">
+    <div className="relative w-48 h-64 md:w-64 md:h-80 mx-auto">
       {/* Base character */}
       <Image
         src="/booba/character.png"
@@ -30,7 +30,7 @@ export function BoobaCharacter({ mouthShape = "closed" }: BoobaCharacterProps) {
       />
 
       {/* Mouth overlay */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-20 h-12">
+      <div className="absolute bottom-[4.5rem] md:bottom-24 left-1/2 -translate-x-1/2 w-16 h-10 md:w-20 md:h-12">
         <Image
           src={mouthImages[mouthShape]}
           alt="mouth"

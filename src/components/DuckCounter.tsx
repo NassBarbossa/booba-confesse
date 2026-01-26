@@ -18,7 +18,7 @@ export function DuckCounter() {
       <p className="text-sm text-red-300 uppercase tracking-wide">
         Jours depuis que Booba a fui
       </p>
-      <p className="text-5xl font-bold text-red-500">{days}</p>
+      <p className="text-4xl md:text-5xl font-bold text-red-500">{days}</p>
     </div>
   );
 }

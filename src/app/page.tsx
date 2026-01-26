@@ -7,7 +7,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8">
         {/* Header with Duck Counter */}
         <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4">
             Booba Confesse
           </h1>
           <p className="text-xl text-zinc-400 mb-6">
