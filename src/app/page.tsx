@@ -1,3 +1,5 @@
+import { DuckCounter } from "@/components/DuckCounter";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-zinc-900 to-black text-white">
@@ -7,9 +9,10 @@ export default function Home() {
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
             Booba Confesse
           </h1>
-          <p className="text-xl text-zinc-400">
+          <p className="text-xl text-zinc-400 mb-6">
             Fais-le avouer la vérité
           </p>
+          <DuckCounter />
         </header>
 
         {/* Main confession area - placeholder */}
