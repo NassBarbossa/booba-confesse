@@ -90,16 +90,16 @@ export async function generateAudioMiniMax({
     );
   }
 
-  // The audio is returned as base64 in the response
-  if (!data.audio_file) {
+  // The audio is returned as hex string in data.audio
+  const audioHex = data.data?.audio;
+  if (!audioHex) {
     throw new Error("No audio data in response");
   }
 
-  // Decode base64 to ArrayBuffer
-  const binaryString = atob(data.audio_file);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+  // Decode hex to ArrayBuffer
+  const bytes = new Uint8Array(audioHex.length / 2);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(audioHex.substr(i * 2, 2), 16);
   }
 
   return bytes.buffer;
