@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateAudio as generateAudioElevenLabs } from "@/lib/elevenlabs";
 import { generateAudioXTTS } from "@/lib/xtts";
+import { generateAudioMiniMax } from "@/lib/minimax";
 import { checkRateLimit } from "@/lib/rateLimit";
 
-// TTS Provider: "xtts" or "elevenlabs"
-const TTS_PROVIDER = process.env.TTS_PROVIDER || "xtts";
+// TTS Provider: "minimax" (default), "xtts", or "elevenlabs"
+const TTS_PROVIDER = process.env.TTS_PROVIDER || "minimax";
 
 export async function POST(request: NextRequest) {
   // Rate limiting
@@ -38,10 +39,14 @@ export async function POST(request: NextRequest) {
     let audioBuffer: ArrayBuffer;
     let contentType: string;
 
-    if (TTS_PROVIDER === "xtts") {
+    if (TTS_PROVIDER === "minimax") {
+      // Use MiniMax (primary)
+      audioBuffer = await generateAudioMiniMax({ text });
+      contentType = "audio/mpeg";
+    } else if (TTS_PROVIDER === "xtts") {
       // Use XTTS
       audioBuffer = await generateAudioXTTS({ text });
-      contentType = "audio/wav"; // XTTS returns WAV by default
+      contentType = "audio/wav";
     } else {
       // Use ElevenLabs (fallback)
       const voiceId = process.env.ELEVENLABS_VOICE_ID;
