@@ -118,18 +118,9 @@ export function TranslatorBooth() {
 
   return (
     <div className="max-w-xl mx-auto">
-      {/* Character with background */}
-      <div className="mb-8 relative rounded-lg overflow-hidden">
-        <img
-          src="/booba/background.png"
-          alt="Studio"
-          className="w-full h-auto"
-        />
-        <div className="absolute inset-0 flex items-end justify-center">
-          <div className="w-[70%]">
-            <BoobaCharacter mouthShape={state === "playing" ? mouthShape : "closed"} />
-          </div>
-        </div>
+      {/* Character */}
+      <div className="mb-8">
+        <BoobaCharacter mouthShape={state === "playing" ? mouthShape : "closed"} />
       </div>
 
       {/* Video preview when done */}
