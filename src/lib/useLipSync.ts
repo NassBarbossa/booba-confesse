@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 
-type MouthShape = "closed" | "small" | "medium" | "o";
+type MouthShape = "closed" | "small" | "o";
 
 interface UseLipSyncOptions {
   audioElement: HTMLAudioElement | null;
@@ -49,12 +49,10 @@ export function useLipSync({ audioElement, isPlaying }: UseLipSyncOptions): Mout
 
       // Map volume to mouth shape
       let shape: MouthShape;
-      if (average < 10) {
+      if (average < 15) {
         shape = "closed";
       } else if (average < 50) {
         shape = "small";
-      } else if (average < 100) {
-        shape = "medium";
       } else {
         shape = "o";
       }

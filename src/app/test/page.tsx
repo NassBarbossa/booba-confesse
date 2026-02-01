@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BoobaCharacter, MouthShape } from "@/components/BoobaCharacter";
 
-const mouthShapes: MouthShape[] = ["closed", "small", "medium", "o"];
+const mouthShapes: MouthShape[] = ["closed", "small", "o"];
 
 export default function TestPage() {
   const [currentMouth, setCurrentMouth] = useState<MouthShape>("closed");

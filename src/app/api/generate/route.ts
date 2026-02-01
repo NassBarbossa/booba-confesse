@@ -8,19 +8,8 @@ import { checkRateLimit } from "@/lib/rateLimit";
 const TTS_PROVIDER = process.env.TTS_PROVIDER || "minimax";
 
 export async function POST(request: NextRequest) {
-  // Rate limiting
-  const ip =
-    request.headers.get("x-forwarded-for") ||
-    request.headers.get("x-real-ip") ||
-    "unknown";
-  const { allowed, remaining } = checkRateLimit(ip);
-
-  if (!allowed) {
-    return NextResponse.json(
-      { error: "Limite atteinte. Reviens demain!" },
-      { status: 429 }
-    );
-  }
+  // Rate limiting disabled for Phase 1 (admin mode)
+  const remaining = 999;
 
   try {
     const { text } = await request.json();

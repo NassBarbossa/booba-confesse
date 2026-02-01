@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-export type MouthShape = "closed" | "small" | "medium" | "o";
+export type MouthShape = "closed" | "small" | "o";
 
 interface BoobaCharacterProps {
   mouthShape?: MouthShape;
@@ -11,7 +11,6 @@ interface BoobaCharacterProps {
 const mouthImages: Record<MouthShape, string> = {
   closed: "/booba/mouth-closed.png",
   small: "/booba/mouth-open-small.png",
-  medium: "/booba/mouth-open-medium.png",
   o: "/booba/mouth-o.png",
 };
 

@@ -10,13 +10,12 @@ const VIDEO_HEIGHT = 1080;
 const FPS = 30;
 
 // Mouth shapes available
-const MOUTH_SHAPES = ["closed", "small", "medium", "o"] as const;
+const MOUTH_SHAPES = ["closed", "small", "o"] as const;
 type MouthShape = (typeof MOUTH_SHAPES)[number];
 
 const MOUTH_FILES: Record<MouthShape, string> = {
   closed: "mouth-closed.png",
   small: "mouth-open-small.png",
-  medium: "mouth-open-medium.png",
   o: "mouth-o.png",
 };
 
@@ -277,8 +276,7 @@ function interpolateToFrames(values: number[], targetCount: number): number[] {
 
 function volumeToMouthShape(volume: number): MouthShape {
   if (volume < 0.2) return "closed";
-  if (volume < 0.45) return "small";
-  if (volume < 0.7) return "medium";
+  if (volume < 0.5) return "small";
   return "o";
 }
 
@@ -320,32 +318,11 @@ async function generateFrame(
   const mouthX = charX + Math.floor((characterSize - mouthWidth) / 2);
   const mouthY = charY + Math.floor(characterSize * 0.52) - Math.floor(mouthHeight / 2);
 
-  // Create subtitle overlay
-  const subtitleHeight = 120;
-  const subtitleY = height - subtitleHeight - 50;
-
-  // Wrap text for subtitle
-  const maxCharsPerLine = 40;
-  const wrappedText = wrapText(text, maxCharsPerLine);
-
-  const subtitleSvg = `
-    <svg width="${width}" height="${subtitleHeight}">
-      <rect x="40" y="0" width="${width - 80}" height="${subtitleHeight}" rx="10" fill="rgba(0,0,0,0.8)"/>
-      <text x="${width / 2}" y="${subtitleHeight / 2 + 8}"
-            font-family="Arial, sans-serif" font-size="32" font-weight="bold"
-            fill="white" text-anchor="middle" dominant-baseline="middle">
-        ${escapeXml(wrappedText)}
-      </text>
-    </svg>
-  `;
-  const subtitleBuffer = Buffer.from(subtitleSvg);
-
-  // Composite everything
+  // Composite everything (no subtitles)
   const frame = await background
     .composite([
       { input: resizedCharacter, left: charX, top: charY },
       { input: resizedMouth, left: mouthX, top: mouthY },
-      { input: subtitleBuffer, left: 0, top: subtitleY },
     ])
     .png()
     .toBuffer();
