@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-export type MouthShape = "closed" | "small" | "medium" | "wide" | "o" | "ee";
+export type MouthShape = "closed" | "small" | "o";
 
 interface BoobaCharacterProps {
   mouthShape?: MouthShape;
@@ -11,15 +11,12 @@ interface BoobaCharacterProps {
 const mouthImages: Record<MouthShape, string> = {
   closed: "/booba/mouth-closed.png",
   small: "/booba/mouth-open-small.png",
-  medium: "/booba/mouth-open-medium.png",
-  wide: "/booba/mouth-open-wide.png",
   o: "/booba/mouth-o.png",
-  ee: "/booba/mouth-ee.png",
 };
 
 export function BoobaCharacter({ mouthShape = "closed" }: BoobaCharacterProps) {
   return (
-    <div className="relative w-48 h-64 md:w-64 md:h-80 mx-auto">
+    <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto">
       {/* Base character */}
       <Image
         src="/booba/character.png"
@@ -29,8 +26,8 @@ export function BoobaCharacter({ mouthShape = "closed" }: BoobaCharacterProps) {
         priority
       />
 
-      {/* Mouth overlay */}
-      <div className="absolute bottom-[4.5rem] md:bottom-24 left-1/2 -translate-x-1/2 w-16 h-10 md:w-20 md:h-12">
+      {/* Mouth overlay - positioned on face */}
+      <div className="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-20 md:w-32 md:h-24">
         <Image
           src={mouthImages[mouthShape]}
           alt="mouth"
