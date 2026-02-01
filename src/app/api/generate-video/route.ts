@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
     // 4. Load assets
     const publicDir = path.join(process.cwd(), "public", "booba");
     const characterBuffer = await fs.readFile(path.join(publicDir, "character.png"));
+    const backgroundBuffer = await fs.readFile(path.join(publicDir, "background.png"));
 
     const mouthBuffers: Record<MouthShape, Buffer> = {
       closed: await fs.readFile(path.join(publicDir, MOUTH_FILES.closed)),
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
     for (let i = 0; i < totalFrames; i++) {
       const mouthShape = volumeToMouthShape(volumes[i] || 0);
       const frameBuffer = await generateFrame(
+        backgroundBuffer,
         characterBuffer,
         mouthBuffers[mouthShape]
       );
@@ -172,42 +174,41 @@ function volumeToMouthShape(volume: number): MouthShape {
 }
 
 async function generateFrame(
+  backgroundBuffer: Buffer,
   characterBuffer: Buffer,
   mouthBuffer: Buffer
 ): Promise<Buffer> {
-  // Character size (60% of video height)
-  const charSize = Math.floor(VIDEO_HEIGHT * 0.6);
+  // Resize background to video size
+  const resizedBg = await sharp(backgroundBuffer)
+    .resize(VIDEO_WIDTH, VIDEO_HEIGHT, { fit: "cover" })
+    .toBuffer();
+
+  // Character size (75% of video height - bigger!)
+  const charSize = Math.floor(VIDEO_HEIGHT * 0.75);
 
   // Resize character
   const resizedChar = await sharp(characterBuffer)
     .resize(charSize, charSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .toBuffer();
 
-  // Mouth size (25% of character)
-  const mouthWidth = Math.floor(charSize * 0.25);
-  const mouthHeight = Math.floor(charSize * 0.2);
+  // Mouth size (22% of character width)
+  const mouthWidth = Math.floor(charSize * 0.22);
+  const mouthHeight = Math.floor(charSize * 0.18);
 
   const resizedMouth = await sharp(mouthBuffer)
     .resize(mouthWidth, mouthHeight, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .toBuffer();
 
-  // Positions
+  // Positions - character centered at bottom
   const charX = Math.floor((VIDEO_WIDTH - charSize) / 2);
-  const charY = Math.floor(VIDEO_HEIGHT * 0.15);
+  const charY = VIDEO_HEIGHT - charSize;
 
   // Mouth at 52% of character height, centered
   const mouthX = charX + Math.floor((charSize - mouthWidth) / 2);
   const mouthY = charY + Math.floor(charSize * 0.52) - Math.floor(mouthHeight / 2);
 
-  // Create frame
-  const frame = await sharp({
-    create: {
-      width: VIDEO_WIDTH,
-      height: VIDEO_HEIGHT,
-      channels: 4,
-      background: { r: 24, g: 24, b: 27, alpha: 1 },
-    },
-  })
+  // Create frame with background
+  const frame = await sharp(resizedBg)
     .composite([
       { input: resizedChar, left: charX, top: charY },
       { input: resizedMouth, left: mouthX, top: mouthY },
