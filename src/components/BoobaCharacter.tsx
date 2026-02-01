@@ -27,7 +27,7 @@ export function BoobaCharacter({ mouthShape = "closed" }: BoobaCharacterProps) {
       />
 
       {/* Mouth overlay - positioned on face */}
-      <div className="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-20 md:w-32 md:h-24">
+      <div className="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-20 md:w-32 md:h-24">
         <Image
           src={mouthImages[mouthShape]}
           alt="mouth"
