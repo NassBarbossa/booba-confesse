@@ -5,6 +5,9 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 import os from "os";
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+
+const ffmpegPath = ffmpegInstaller.path;
 
 const VIDEO_WIDTH = 1080;
 const VIDEO_HEIGHT = 1080;
@@ -102,18 +105,25 @@ export async function POST(request: NextRequest) {
 
 async function getAudioDuration(audioPath: string): Promise<number> {
   return new Promise((resolve, reject) => {
-    const ffprobe = spawn("ffprobe", [
-      "-v", "error",
-      "-show_entries", "format=duration",
-      "-of", "default=noprint_wrappers=1:nokey=1",
-      audioPath,
+    // Use ffmpeg to get duration (stderr contains the info)
+    const ffmpeg = spawn(ffmpegPath, [
+      "-i", audioPath,
+      "-f", "null", "-"
     ]);
 
-    let output = "";
-    ffprobe.stdout.on("data", (data) => (output += data.toString()));
-    ffprobe.on("close", (code) => {
-      if (code === 0) resolve(parseFloat(output.trim()));
-      else reject(new Error("ffprobe failed"));
+    let stderr = "";
+    ffmpeg.stderr.on("data", (data) => (stderr += data.toString()));
+    ffmpeg.on("close", () => {
+      // Parse duration from ffmpeg output: "Duration: 00:00:05.23"
+      const match = stderr.match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
+      if (match) {
+        const hours = parseInt(match[1]);
+        const minutes = parseInt(match[2]);
+        const seconds = parseFloat(match[3]);
+        resolve(hours * 3600 + minutes * 60 + seconds);
+      } else {
+        reject(new Error("Could not parse duration"));
+      }
     });
   });
 }
@@ -121,7 +131,7 @@ async function getAudioDuration(audioPath: string): Promise<number> {
 async function analyzeAudioVolumes(audioPath: string, totalFrames: number): Promise<number[]> {
   return new Promise((resolve) => {
     // Extract raw PCM and analyze
-    const ffmpeg = spawn("ffmpeg", [
+    const ffmpeg = spawn(ffmpegPath, [
       "-i", audioPath,
       "-ac", "1",
       "-ar", "8000",
@@ -226,7 +236,7 @@ async function encodeVideo(
   fps: number
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const ffmpeg = spawn("ffmpeg", [
+    const ffmpeg = spawn(ffmpegPath, [
       "-y",
       "-framerate", String(fps),
       "-i", path.join(framesDir, "frame_%05d.png"),
