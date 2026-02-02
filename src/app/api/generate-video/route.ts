@@ -5,9 +5,9 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 import os from "os";
-import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+import ffmpegStatic from "ffmpeg-static";
 
-const ffmpegPath = ffmpegInstaller.path;
+const ffmpegPath = ffmpegStatic as string;
 
 const VIDEO_WIDTH = 1080;
 const VIDEO_HEIGHT = 1080;
